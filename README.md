@@ -1,4 +1,5 @@
 # README
+![example workflow](https://github.com/alehkahnovich/chain/actions/workflows/dotnet.yml/badge.svg)
 ## Chain declaration
 ```c#
 public interface IChain {
