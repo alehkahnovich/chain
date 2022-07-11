@@ -1,5 +1,6 @@
 using Chain.Extensions;
-using Chain.UnitTest.Moq;
+using Chain.UnitTest.Moq.Disposable;
+using Chain.UnitTest.Moq.Simple;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using System.Collections.Generic;
@@ -30,6 +31,27 @@ namespace Chain.UnitTest {
 
             //Assert.
             Assert.That(accumulator, Is.EqualTo(new[] { nameof(ChainThree), nameof(ChainTwo), nameof(ChainOne) }));
+        }
+
+        [Test]
+        public void ShouldBeDisposable() {
+            //Arrange.
+            var accumulator = new List<string>();
+            var provider = _collection.Chain<IDisposableChain, DisposableChainOne>(ServiceLifetime.Scoped)
+                .Next<DisposableChainTwo>()
+                .Configure()
+                .BuildServiceProvider();
+
+            //Act.
+            using (var scope = provider.CreateScope()) {
+
+                var chain = scope.ServiceProvider.GetRequiredService<IDisposableChain>();
+
+                chain.Invoke(accumulator);
+            }
+
+            //Assert.
+            Assert.That(accumulator, Is.EqualTo(new[] { nameof(DisposableChainOne), nameof(DisposableChainTwo) }));
         }
     }
 }

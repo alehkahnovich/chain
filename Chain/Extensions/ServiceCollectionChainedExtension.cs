@@ -14,7 +14,8 @@ namespace Chain.Extensions {
 
         public static IChainedServiceCollection<TService> Next<TService, TImplementation>(
             this IChainedServiceCollection<TService> collection)
-            where TService : class => collection.Next<TImplementation>();
+            where TService : class
+            where TImplementation : class, TService => collection.Next<TImplementation>();
 
         public static IServiceCollection Configure<TService>(
             this IChainedServiceCollection<TService> collection)

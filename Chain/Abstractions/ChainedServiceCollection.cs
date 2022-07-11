@@ -15,7 +15,7 @@ namespace Chain.Abstractions {
             _next = new List<Type>();
         }
 
-        public IChainedServiceCollection<TService> Next<TImplementation>() {
+        public IChainedServiceCollection<TService> Next<TImplementation>() where TImplementation : class, TService {
             _next.Add(typeof(TImplementation));
             return this;
         }
@@ -27,7 +27,7 @@ namespace Chain.Abstractions {
             for (var step = 0; step < _next.Count; step++) {
                 var implementation = _next[step];
                 var next = step < _next.Count - 1 ? _next[step + 1] : null;
-   
+
                 descriptors[_next.Count - 1 - step] = new ServiceDescriptor(step == 0 ? typeof(TService) : implementation,
                     ChainedFactory.Make<TService>(implementation, next),
                     _lifeTime);
