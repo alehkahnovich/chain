@@ -24,13 +24,33 @@ namespace Chain.UnitTest {
                 .Configure()
                 .BuildServiceProvider();
 
+            //Act.
             var chain = provider.GetRequiredService<IChain>();
 
-            //Act.
             chain.Invoke(accumulator);
 
             //Assert.
-            Assert.That(accumulator, Is.EqualTo(new[] { nameof(ChainThree), nameof(ChainTwo), nameof(ChainOne) }));
+            Assert.That(accumulator, Is.EqualTo(new[] { nameof(ChainOne), nameof(ChainTwo), nameof(ChainThree) }));
+        }
+
+
+        [Test]
+        public void ShouldNotCreateCircularDependencies() {
+            //Arrange.
+            var accumulator = new List<string>();
+            var provider = _collection.Chain<IChain, ChainOne>()
+                .Next<ChainTwo>()
+                .Next<ChainCircular>()
+                .Configure()
+                .BuildServiceProvider();
+            
+            //Act.
+            var chain = provider.GetRequiredService<IChain>();
+
+            chain.Invoke(accumulator);
+
+            //Assert.
+            Assert.That(accumulator, Is.EqualTo(new[] { nameof(ChainOne), nameof(ChainTwo), nameof(ChainCircular) }));
         }
 
         [Test]

@@ -5,13 +5,13 @@ namespace Chain.Abstractions {
     internal sealed class ChainedFactory {
         public static Func<IServiceProvider, TService> Make<TService>(Type implementation, Type next) where TService : class {
             return provider => {
-                var ctors = implementation.GetConstructors()
+                var constructors = implementation.GetConstructors()
                 .Select(ctor => new {
                     Info = ctor,
                     Parameters = ctor.GetParameters()
                 });
 
-                foreach (var ctor in ctors.OrderByDescending(src => src.Parameters.Length)) {
+                foreach (var ctor in constructors.OrderByDescending(src => src.Parameters.Length)) {
                     var parameters = ctor.Parameters;
                     var args = new object[parameters.Length];
                     for (var param = 0; param < parameters.Length; param++) {
@@ -21,7 +21,7 @@ namespace Chain.Abstractions {
                             continue;
                         }
 
-                        args[param] = provider.GetService(info.ParameterType);
+                        args[param] = next != null ? provider.GetService(info.ParameterType) : default(TService);
                     }
 
                     return Activator.CreateInstance(implementation, args) as TService;

@@ -7,8 +7,8 @@ namespace Chain.UnitTest.Moq.Simple {
         public ChainOne(IChain next) => _next = next;
 
         public async Task Invoke(List<string> accumulator) {
-            await _next.Invoke(accumulator);
             accumulator.Add(nameof(ChainOne));
+            await _next.Invoke(accumulator);
         }
     }
 }
